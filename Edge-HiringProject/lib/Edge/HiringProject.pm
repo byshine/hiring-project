@@ -3,6 +3,7 @@ use Dancer2;
 use Dancer2::Plugin::DBIC;
 use Dancer2::Plugin::Debugger;
 use Edge::Customer;
+use Edge::Order;
 
 our $VERSION = '0.1';
 

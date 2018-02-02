@@ -1,6 +1,8 @@
 package Edge::Customer;
 
 use Moose;
+use Edge::Order;
+use Data::Dumper;
 
 has 'schema' => (
   is => 'ro',
@@ -56,7 +58,34 @@ has 'orders' => (
   lazy => 1,
   default => sub {
     my $self = shift;
-    return [];
+    my $order;	
+    my $order_form = $self->schema->resultset('FormSubmission')->search(
+                    {
+                      'data' => \["->>'id' = ?", $self->id],
+                      'data' => \["->>'form' = 'order'"],
+                    },
+                    {
+                      'order_by' => { -desc => 'id' },
+                    },
+                  );
+
+    if ( $order_form ) {
+	my @orders;
+	for my $orderResult ( $order_form->all ) {
+                $order = Edge::Order->new(
+                product => $orderResult->data->{product},
+                price   => $orderResult->data->{price},
+                quantity => $orderResult->data->{quantity},
+		total => ($orderResult->data->{price} * $orderResult->data->{quantity}),
+                );
+                push @orders, $order
+	}
+      return \@orders
+    }
+    else {
+      return [];
+    }
+
   },
 );
 
