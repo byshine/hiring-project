@@ -3,7 +3,7 @@ use Dancer2;
 use Dancer2::Plugin::DBIC;
 use Dancer2::Plugin::Debugger;
 use Edge::Customer;
-use Edge::Order;
+
 
 our $VERSION = '0.1';
 
@@ -19,12 +19,15 @@ get '/form/:form_name' => sub {
     my $form = $schema->resultset('Form')->search({
                   'data' => \"->>'name' = '$form_name'"
                 })->single;
+
+    my $customer = Edge::Customer->new( schema => schema('edge'), id => session->id );
     if ($form) {
       template 'form' => {
         'form' => $form_name,
         'title' => $form->data->{title},
         'form_description' => $form->data->{description},
         'form_fields' => $form->data->{fields},
+	'customer' => $customer,
       };
     }
     else {

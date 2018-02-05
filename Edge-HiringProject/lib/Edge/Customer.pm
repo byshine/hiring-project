@@ -2,7 +2,7 @@ package Edge::Customer;
 
 use Moose;
 use Edge::Order;
-use Data::Dumper;
+use Time::Piece;
 
 has 'schema' => (
   is => 'ro',
@@ -40,6 +40,37 @@ has 'profile_form' => (
   },
 );
 
+has 'birthdate' => (
+  is => 'ro',
+  isa => 'Str',
+  lazy => 1,
+  default => sub {
+    my $self = shift;
+    my $birthdate = $self->profile_form->{birthdate};
+    if ($birthdate eq ' ') { return 'mm/dd/yyyy'; }
+    return $birthdate;
+  },
+);
+
+has 'age' => (
+  is => 'ro',
+  isa => 'Str',
+  lazy => 1,
+  default => sub {
+    my $self = shift;
+    my $birthdate = Time::Piece->strptime($self->birthdate, '%Y-%m-%d');
+    my $birthyear = $birthdate->year;
+    my $localyear = localtime->year;
+    my $age = $localyear - $birthyear;
+    if ( ($birthdate->mon >= localtime->mon) && ($birthdate->wday >= localtime->wday) ) {
+    	$age--;
+    }	
+    return $age;
+  },
+);
+
+
+
 has 'name' => (
   is => 'ro',
   isa => 'Str',
@@ -49,6 +80,31 @@ has 'name' => (
     my $name = ($self->profile_form->{fname} || '') . ' ' . ($self->profile_form->{lname} || '');
     if ($name eq ' ') { return '--not set--'; }
     return $name;
+  },
+);
+
+has 'fname' => (
+  is => 'ro',
+  isa => 'Str',
+  lazy => 1,
+  default => sub {
+    my $self = shift;
+    my $fname = ($self->profile_form->{fname} || '');
+    if ($fname eq ' ') { return '--not set--'; }
+    return $fname;
+  },
+);
+
+
+has 'lname' => (
+  is => 'ro',
+  isa => 'Str',
+  lazy => 1,
+  default => sub {
+    my $self = shift;
+    my $lname = ($self->profile_form->{lname} || '');
+    if ($lname eq ' ') { return '--not set--'; }
+    return $lname;
   },
 );
 

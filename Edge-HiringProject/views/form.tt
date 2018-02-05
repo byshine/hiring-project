@@ -12,7 +12,11 @@
           [% END %]
             <input type="submit" value="SUBMIT">
           </form>
-
       </div>
     </div>
 </div>
+<script>
+$('input[name="fname"]').attr('value', '[% customer.fname %]');
+$('input[name="lname"]').attr('value', '[% customer.lname %]');
+$('input[name="birthdate"]').attr('value', '[% customer.birthdate %]');
+</script>
